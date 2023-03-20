@@ -2,17 +2,7 @@
 
 namespace Io238\ISOCountries\Models;
 
-class Country extends BaseModel {
-
-    protected $casts = [
-        'borders'        => 'array',
-        'currency_codes' => 'array',
-        'language_codes' => 'array',
-        'is_independent' => 'boolean',
-        'is_un_member'   => 'boolean',
-        'is_eu_member'   => 'boolean',
-    ];
-
+class Country extends IsoBaseModel {
 
     public function languages()
     {
@@ -29,12 +19,6 @@ class Country extends BaseModel {
     public function neighbours()
     {
         return $this->belongsToMany(Country::class, 'country_country', 'country_id', 'neighbour_id');
-    }
-
-
-    public function resolveRouteBinding($value, $field = null)
-    {
-        return parent::resolveRouteBinding(strtoupper($value), $field);
     }
 
 }

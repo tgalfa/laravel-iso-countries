@@ -2,16 +2,11 @@
 
 namespace Io238\ISOCountries\Models;
 
-class Language extends BaseModel {
+class Language extends IsoBaseModel {
 
     public function countries()
     {
         return $this->belongsToMany(Country::class);
-    }
-
-    public function resolveRouteBinding($value, $field = null)
-    {
-        return parent::resolveRouteBinding(strtolower($value), $field);
     }
 
 }

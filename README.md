@@ -1,7 +1,7 @@
 # Laravel ISO Countries
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/io238/laravel-iso-countries.svg?label=Version)](https://packagist.org/packages/io238/laravel-iso-countries)
-[![GitHub Tests Action Status](https://github.com/io238/laravel-iso-countries/workflows/Tests/badge.svg?branch=main)](https://github.com/io238/laravel-iso-countries/actions?query=workflow%3ATests+branch%3Amain)
+[![GitHub Tests Action Status](https://github.com/io238/laravel-iso-countries/workflows/Tests/badge.svg?branch=master)](https://github.com/io238/laravel-iso-countries/actions?query=workflow%3ATests+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/io238/laravel-iso-countries.svg?label=Downloads)](https://packagist.org/packages/io238/laravel-iso-countries)
 
 This package provides ready-to-use application models and seeds the database with ISO data from various sources. This
@@ -38,22 +38,24 @@ You can install the package via composer:
 composer require io238/laravel-iso-countries
 ```
 
-The latest version of this package requires PHP version 8.0 or above. If you need support for PHP 7.4, please install
-version 2 of this package.
-
 ### Migrations
 
-There is no need to run any migrations. All country data information is stored in a pre-compiled SQLITE database that is
-stored within this package.
+You can publish and run the migrations with:
 
-By default, this database includes all country/language/&currency names translated into English, German, French, and
-Spanish. If you want to compile your own database with other languages,
-please [see the instructions here](#data-updates--translations).
+```bash
+php artisan vendor:publish --provider="Io238\ISOCountries\ISOCountriesServiceProvider" --tag="migrations"
+php artisan migrate
+```
 
-### Rebuilding the database
+The data is **automatically seeded** to the database at the end of the migration process.
 
-Country-level ISO data does not change very often. Nevertheless, if at any time you want to update the ISO data to the
-latest available version, you can manually re-seed the tables:
+### Data updates
+
+Country-level ISO data does not change very often. Nevertheless, if at any time you want to update the ISO data to the latest available version, you can manually re-seed the tables:
+
+```bash
+php artisan db:seed --force --class="Io238\ISOCountries\Database\Seeders\IsoSeeder"
+```
 
 ### Config
 
@@ -68,35 +70,18 @@ In the config you can define, which translations of country/language/currency na
 This is the contents of the published config file:
 
 ```php
-[
-    // Supported locales for names (countries, languages, currencies)
+return [
     'locales' => [
         'en',
         'de',
         'fr',
         'es',
     ],
-
-    // Path for storing your own SQLITE database
-    'database_path' => database_path('iso-countries.sqlite'),
 ];
 ```
 
-After making changes to the config you need to re-build the database with the following command:
+After changing the config make sure to [re-seed the database](#data-updates) to reflect the changes.
 
-```bash
-php artisan db:seed countries:build
-```
-
-This will create a new SQLITE database and stores it in your project at `database/iso-countries.sqlite`. Exclude this
-file from `.gitignore` to have it available in all environments.
-
-```gitignore
-# database/.gitignore
-
-*.sqlite*
-!iso-countries.sqlite
-```
 
 ## Usage
 
@@ -107,7 +92,7 @@ Country::find('AD');
 
 Io238\ISOCountries\Models\Country {
      id: "AD",
-     alpha3: "AND",
+     alpha_3: "AND",
      name: "{"en":"Andorra","de":"Andorra","fr":"Andorre","es":"Andorra"}",
      native_name: "Andorra",
      capital: "Andorra la Vella",
@@ -120,6 +105,7 @@ Io238\ISOCountries\Models\Country {
      lon: 1.5,
      demonym: "Andorran",
      area: 468,
+     gini: null,
    }
 ```
 
@@ -253,10 +239,10 @@ config `app.locale` and `app.fallback_locale` are automatically included.
 // Set the app locale
 app()->setLocale('fr');
 
-// Retrieve the top 10 countries in Africa (by population):
+// Retrieve the top 10 countries in Africa (by polulation):
 Io238\ISOCountries\Models\Country::where('region', 'Africa')->orderByDesc('population')->limit(10)->pluck('name');
 
-// Country names will be returned according to the app locale (fr = French)
+// Country names will be returned in the app locale (fr = French)
 Illuminate\Support\Collection {
      all: [
        "Nigéria",
@@ -278,14 +264,14 @@ Illuminate\Support\Collection {
 If you already use ISO codes in your models, you can enrich them by casting them as Country/Language/Currency model:
 
 ```php
-use Io238\ISOCountries\Casts\Currency;
+use Io238\ISOCountries\Casts\CurrencyCast;
 
 class MyModel{
     
     // ...
 
     protected $casts = [
-        'currency' => Currency::class,
+        'currency' => CurrencyCast::class,
     ];
     
     // ...
@@ -316,6 +302,10 @@ MyModel::first()->update(['currency' => Io238\ISOCountries\Models\Currency::find
 composer test
 ```
 
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
 ## Contributing
 
 Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
@@ -327,12 +317,12 @@ Please review [our security policy](../../security/policy) on how to report secu
 ## Credits
 
 - [Martin](https://github.com/io238)
+- [All Contributors](../../contributors)
 - https://restcountries.com
 - https://github.com/umpirsky/country-list
 - https://github.com/umpirsky/language-list
 - https://github.com/umpirsky/currency-list
 - https://github.com/spatie/laravel-translatable
-- [All Contributors](../../contributors)
 
 ## License
 

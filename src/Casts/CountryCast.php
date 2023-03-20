@@ -3,10 +3,10 @@
 namespace Io238\ISOCountries\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Io238\ISOCountries\Models\Country as CountryModel;
+use Io238\ISOCountries\Models\Country;
 
 
-class Country implements CastsAttributes {
+class CountryCast implements CastsAttributes {
 
     /**
      * Cast the given value.
@@ -19,7 +19,7 @@ class Country implements CastsAttributes {
      */
     public function get($model, $key, $value, $attributes)
     {
-        return CountryModel::find(strtoupper($value));
+        return Country::find($value);
     }
 
 
@@ -34,7 +34,7 @@ class Country implements CastsAttributes {
      */
     public function set($model, $key, $value, $attributes)
     {
-        return strtoupper($value instanceof CountryModel ? $value->id : $value);
+        return $value instanceof Country ? $value->id : $value;
     }
 
 }

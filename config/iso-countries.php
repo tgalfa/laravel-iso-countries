@@ -3,14 +3,12 @@
 return [
 
     // Supported locales for names (countries, languages, currencies)
+    // IMPORTANT: After modifying, (re-)seed the database to apply changes
     'locales' => [
         'en',
         'de',
         'fr',
         'es',
     ],
-
-    // Path for storing your own SQLITE database
-    'database_path' => database_path('iso-countries.sqlite'),
 
 ];
